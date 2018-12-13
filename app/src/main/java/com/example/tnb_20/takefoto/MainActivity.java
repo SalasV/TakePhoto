@@ -20,7 +20,32 @@ public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     Intent takePictureIntent;
-    File dir = new File("data"+File.separator+"data"+File.separator+"com.example.tnb_20.takefoto"+File.separator+"fotos");
+    File dir = new File("data"+File.separator+"data"
+                        +File.separator+"com.example.tnb_20.takefoto"
+                            +File.separator+"fotos");
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            ImageView iv = findViewById(R.id.imageView);
+            iv.setImageBitmap(imageBitmap);
+            OutputStream os = null;
+            try {
+                for (int i = 0; i<=dir.listFiles().length; i++){
+                    File file = new File(dir, "foto" + i + ".png");
+                    if (!file.exists()){
+                        os = new FileOutputStream(file);
+                        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
+                        i=dir.listFiles().length;
+                    }
+                }
+            } catch(IOException e) {
+                System.out.println("ERROR");
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,28 +72,5 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            ImageView iv = findViewById(R.id.imageView);
-            iv.setImageBitmap(imageBitmap);
-            OutputStream os = null;
-            try {
-                for (int i = 0; i<=dir.listFiles().length; i++){
-                    File file = new File(dir, "foto" + i + ".png");
-                    if (!file.exists()){
-                        os = new FileOutputStream(file);
-                        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
-                        i=dir.listFiles().length;
-                    }
-                }
-            } catch(IOException e) {
-                System.out.println("ERROR");
-            }
-        }
     }
 }
